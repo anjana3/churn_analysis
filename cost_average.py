@@ -1,55 +1,32 @@
 import pandas as pd
 import numpy as np
 import sys
-
-# opening the CSV with the right encoding
-df = pd.read_csv("/home/anjana/anjana/csv/combined_transactions.csv")
-# df = pd.read_csv('transactions_test.csv')
-
-# print number of rows and data type of each column of the dataframe
-print(len(df))
-print(df.dtypes)
-
-# for each customer, finding its first order date and last order date, its most common order type, number of orders placed, mean/median between orders
-df["sales"] = df["selling_price"] * df["qty_shipped"]
-
-df_sales = (
-    df[["customer_num", "order_num", "sales"]]
-    .groupby(["order_num", "customer_num"])
-    .sum()
-)
-df_sales.rename(columns={"sales": "average_order_cost"}, inplace=True)
-sales_df = pd.merge(df, df_sales, how="left", on=["customer_num", "order_num"])
-
-df_avg = (
-    sales_df[["customer_num", "average_order_cost"]].groupby(["customer_num"]).mean()
-)
-
-final_df = pd.merge(df, df_avg, how="left", on=["customer_num"])
-
 import pdb
 
+# opening the CSV with the right encoding
+data = pd.read_csv("/home/anjana/Desktop/short.csv")
+# pdb.set_trace()
+# caluculating the product between selling price and qty_shipped
+data["average_order_cost"] = data["selling_price"] * data["qty_shipped"]
+# print(data)
+data1 = data.groupby(["customer_num", "order_num"]).sum()
+# print(data1.head())
+data2 = data1.reset_index()
+data3 = data2[["customer_num", "average_order_cost"]].groupby(["customer_num"]).mean()
+data4 = data3.reset_index()
+# print(data4)
+data4.to_csv("average_order_cost.csv", index=False)
 df_qua = (
-    df[["customer_num", "order_num", "qty_shipped"]]
+    data[["customer_num", "order_num", "qty_shipped"]]
     .groupby(["order_num", "customer_num"])
     .sum()
 )
 df_qua.rename(columns={"qty_shipped": "average_order_size"}, inplace=True)
-df_qua_avg = pd.merge(df, df_qua, how="left", on=["customer_num", "order_num"])
+data6 = df_qua.reset_index()
+data7 = data6[["customer_num", "average_order_size"]].groupby(["customer_num"]).mean()
+data7 = data7.reset_index()
+data7.to_csv("average.csv", index=False)
+final_df_qua = pd.merge(data7, data4, how="left", on=["customer_num"])
+final_df_qua.to_csv("average_order_size.csv", index=False)
 
-
-df_avg_qua = (
-    df_qua_avg[["customer_num", "average_order_size"]].groupby(["customer_num"]).mean()
-)
-
-final_df_qua = pd.merge(final_df, df_avg_qua, how="left", on=["customer_num"])
-
-
-final_df[["customer_num", "average_order_cost"]].to_csv(
-    "average_order_cost", index=False
-)
-
-final_df_qua[["customer_num", "average_order_cost", "average_order_size"]].to_csv(
-    "average_order_quality", index=False
-)
-# pdb.set_trace()
+pdb.set_trace()
