@@ -30,3 +30,4 @@ final_df_qua = pd.merge(data7, data4, how="left", on=["customer_num"])
 final_df_qua.to_csv("average_order_size.csv", index=False)
 
 pdb.set_trace()
+#it has the 2 codes to find the average between the order_sot and order_size of the company
